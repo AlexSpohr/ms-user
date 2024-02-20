@@ -1,10 +1,16 @@
 package com.compassuol.sp.challenge.msuser.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
