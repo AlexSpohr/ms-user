@@ -2,15 +2,21 @@ package com.compassuol.sp.challenge.msuser.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.util.Date;
 
+@Setter
+@Getter
+@NoArgsConstructor
 public class UserCreateDto {
 
     @NotBlank
     @Size(min = 3)
-    private String fistName;
+    private String firstName;
 
     @NotBlank
     @Size(min = 3)
@@ -22,6 +28,7 @@ public class UserCreateDto {
 
     @NotNull
     @Past
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date birthdate;
 
     @NotBlank
