@@ -25,6 +25,7 @@ public class User implements Serializable {
     @Column(name = "cpf", nullable = false, unique = true, length = 14)
     private String cpf;
     @Column(name = "birthdate", nullable = false)
+    @Temporal(TemporalType.DATE)
     private Date birthdate;
     @Column(name = "email", nullable = false, unique = true, length = 120)
     private String email;
@@ -33,6 +34,5 @@ public class User implements Serializable {
     @Column(name = "password", nullable = false, length = 200)
     private String password;
     @Column(name = "active", nullable = false)
-    private boolean active;
-
+    private Boolean active;
 }
