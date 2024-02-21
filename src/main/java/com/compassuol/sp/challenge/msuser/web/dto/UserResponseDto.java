@@ -2,7 +2,6 @@ package com.compassuol.sp.challenge.msuser.web.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class UserResponseDto {
     private Long id;
-    private String fistName;
+    private String firstName;
     private String lastName;
     private String cpf;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
