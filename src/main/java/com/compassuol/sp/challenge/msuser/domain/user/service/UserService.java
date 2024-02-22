@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+
+    @Transactional
     public User createUser(User user) {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -30,5 +32,13 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("User not found.")
         );
+    }
+
+    @Transactional
+    public User updatePassword(Long id, User user ) {
+        User userFound = getUserById(id);
+        userFound.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(userFound);
+        return userFound;
     }
 }
