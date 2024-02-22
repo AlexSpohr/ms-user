@@ -10,15 +10,12 @@ import org.modelmapper.ModelMapper;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
+
     public static UserResponseDto toDto(User user) {
         return new ModelMapper().map(user, UserResponseDto.class);
     }
 
-    public static User toUser(UserCreateDto createDto){
-            return new ModelMapper().map(createDto, User.class);
-    }
-
-    public static User toUpdatePassword(UserPasswordDto userPasswordDto){
-        return new ModelMapper().map(userPasswordDto, User.class);
+    public static <T> User toEntity(T dto) {
+        return new ModelMapper().map(dto, User.class);
     }
 }
