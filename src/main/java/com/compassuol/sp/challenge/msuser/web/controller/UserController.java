@@ -4,10 +4,12 @@ package com.compassuol.sp.challenge.msuser.web.controller;
 import com.compassuol.sp.challenge.msuser.domain.user.entity.User;
 import com.compassuol.sp.challenge.msuser.domain.user.service.UserService;
 import com.compassuol.sp.challenge.msuser.web.dto.UserCreateDto;
+import com.compassuol.sp.challenge.msuser.web.dto.UserPasswordDto;
 import com.compassuol.sp.challenge.msuser.web.dto.UserResponseDto;
 import com.compassuol.sp.challenge.msuser.web.dto.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,5 +33,11 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(UserMapper.toDto(user));
+    }
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto userPasswordDto) {
+        userService.updatePassword(id, UserMapper.toUpdatePassword(userPasswordDto));
+        return ResponseEntity.ok().build();
     }
 }
