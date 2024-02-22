@@ -41,4 +41,17 @@ public class UserService {
         userRepository.save(userFound);
         return userFound;
     }
+
+    @Transactional
+    public void updateInformation(Long id, User user) {
+        User existingUser = getUserById(id);
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setCpf(user.getCpf());
+        existingUser.setBirthdate(user.getBirthdate());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setCep(user.getCep());
+        existingUser.setActive(user.getActive());
+        userRepository.save(existingUser);
+    }
 }
