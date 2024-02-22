@@ -2,6 +2,7 @@ package com.compassuol.sp.challenge.msuser.web.dto.mapper;
 
 import com.compassuol.sp.challenge.msuser.domain.user.entity.User;
 import com.compassuol.sp.challenge.msuser.web.dto.UserCreateDto;
+import com.compassuol.sp.challenge.msuser.web.dto.UserPasswordDto;
 import com.compassuol.sp.challenge.msuser.web.dto.UserResponseDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,9 @@ public class UserMapper {
 
     public static User toUser(UserCreateDto createDto){
             return new ModelMapper().map(createDto, User.class);
+    }
+
+    public static User toUpdatePassword(UserPasswordDto userPasswordDto){
+        return new ModelMapper().map(userPasswordDto, User.class);
     }
 }
