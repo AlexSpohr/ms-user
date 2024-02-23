@@ -28,11 +28,11 @@ public class UserController {
 
     @Operation(summary = "Create a new user", description = "Feature to create a new user",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Recurso criado com sucesso",
+                    @ApiResponse(responseCode = "201", description = "Resource created successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
-                    @ApiResponse(responseCode = "409", description = "Usuário já cadastrado no sistema",
+                    @ApiResponse(responseCode = "409", description = "User already registered in the system",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
-                    @ApiResponse(responseCode = "422", description = "Recurso não processado por dados de entrada invalidos",
+                    @ApiResponse(responseCode = "422", description = "Resource not processed due to invalid input data",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @PostMapping
@@ -45,9 +45,9 @@ public class UserController {
 
     @Operation(summary = "Find by id", description = "Feature to find a user by ID",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso",
+                    @ApiResponse(responseCode = "200", description = "User found successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
-                    @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
+                    @ApiResponse(responseCode = "404", description = "User not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @GetMapping("/{id}")
@@ -56,6 +56,15 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
+    @Operation(summary = "Update password", description = "Feature to update password of a user by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User updated successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "422", description = "Resource not processed due to invalid input data",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+            })
     @PutMapping("/{id}/password")
     public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto userPasswordDto) {
         userService.updatePassword(id, UserMapper.toEntity(userPasswordDto));
