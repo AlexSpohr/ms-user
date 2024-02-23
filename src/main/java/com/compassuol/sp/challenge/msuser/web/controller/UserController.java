@@ -43,6 +43,13 @@ public class UserController {
                 .body(UserMapper.toDto(user));
     }
 
+    @Operation(summary = "Find by id", description = "Feature to find a user by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Usuário não encontrado",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+            })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
