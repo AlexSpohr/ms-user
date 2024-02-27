@@ -1,4 +1,4 @@
-package com.compassuol.sp.challenge.msuser.domain.user.config;
+package com.compassuol.sp.challenge.msuser.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
