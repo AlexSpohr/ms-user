@@ -1,4 +1,4 @@
-package com.compassuol.sp.challenge.msuser.domain.user.config;
+package com.compassuol.sp.challenge.msuser.config;
 
 import com.compassuol.sp.challenge.msuser.domain.user.jwt.JwtAuthenticationEntryPoint;
 import com.compassuol.sp.challenge.msuser.domain.user.jwt.JwtAuthorizationFilter;
