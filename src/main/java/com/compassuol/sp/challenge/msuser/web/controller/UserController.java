@@ -1,12 +1,8 @@
 package com.compassuol.sp.challenge.msuser.web.controller;
 
 
-import com.compassuol.sp.challenge.msuser.domain.user.entity.User;
 import com.compassuol.sp.challenge.msuser.domain.user.service.UserService;
-import com.compassuol.sp.challenge.msuser.web.dto.UserUpdateDto;
-import com.compassuol.sp.challenge.msuser.web.dto.UserCreateDto;
-import com.compassuol.sp.challenge.msuser.web.dto.UserPasswordDto;
-import com.compassuol.sp.challenge.msuser.web.dto.UserResponseDto;
+import com.compassuol.sp.challenge.msuser.web.dto.*;
 import com.compassuol.sp.challenge.msuser.web.dto.mapper.UserMapper;
 import com.compassuol.sp.challenge.msuser.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,10 +33,10 @@ public class UserController {
             })
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateDto userCreateDto) {
-        User user = userService.createUser(UserMapper.toEntity(userCreateDto));
+        UserResponseDto user = userService.createUser(userCreateDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(UserMapper.toDto(user));
+                .body(user);
     }
 
     @Operation(summary = "Find by id", description = "Feature to find a user by ID",
@@ -52,8 +48,8 @@ public class UserController {
             })
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(UserMapper.toDto(user));
+        UserResponseDto user = userService.getUserAddressById(id);
+        return ResponseEntity.ok(user);
     }
 
     @Operation(summary = "Update password", description = "Feature to update password of a user by ID",
@@ -82,7 +78,7 @@ public class UserController {
             })
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
-        userService.updateInformation(id, UserMapper.toEntity(userUpdateDto));
+        userService.updateInformation(id, userUpdateDto);
         return ResponseEntity.ok().build();
     }
 }
