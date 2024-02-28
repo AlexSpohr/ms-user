@@ -18,6 +18,8 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "addresses_id", nullable = false, length = 9)
+    private Long addresses_id;
     @Column(name = "first_name", nullable = false, length = 120)
     private String firstName;
     @Column(name = "last_name", nullable = false, length = 120)
@@ -29,8 +31,6 @@ public class User implements Serializable {
     private Date birthdate;
     @Column(name = "email", nullable = false, unique = true, length = 120)
     private String email;
-    @Column(name = "cep", nullable = false, length = 9)
-    private String cep;
     @Column(name = "password", nullable = false, length = 200)
     private String password;
     @Column(name = "active", nullable = false)
