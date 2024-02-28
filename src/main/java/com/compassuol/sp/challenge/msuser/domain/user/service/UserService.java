@@ -5,8 +5,8 @@ import com.compassuol.sp.challenge.msuser.domain.user.entity.User;
 
 import com.compassuol.sp.challenge.msuser.domain.user.exception.UserUniqueViolationException;
 import com.compassuol.sp.challenge.msuser.domain.user.repository.UserRepository;
+import com.compassuol.sp.challenge.msuser.web.dto.*;
 import com.compassuol.sp.challenge.msuser.web.producer.UserProducerAddress;
-import com.compassuol.sp.challenge.msuser.web.dto.NotificationDto;
 import com.compassuol.sp.challenge.msuser.web.producer.UserProducerNotification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +26,31 @@ public class UserService {
     private final UserProducerNotification userProducerNotification;
 
     @Transactional
-    public User createUser(User user) {
+    public UserResponseDto createUser(UserCreateDto userDto) {
         try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            User user = new User();
+            user.setFirstName(userDto.getFirstName());
+            user.setLastName(userDto.getLastName());
+            user.setCpf(userDto.getCpf());
+            user.setBirthdate(userDto.getBirthdate());
+            user.setEmail(userDto.getEmail());
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            user.setActive(userDto.getActive());
+
+            AddressDto address = userProducerAddress.saveAddress(userDto.getCep());
+            user.setAddresses_id(address.getId());
+
+            AddressResponseDto addressResponseDto = new AddressResponseDto();
+            addressResponseDto.setAddressFromDto(address);
+
             userRepository.save(user);
-            userProducerAddress.saveAddress(user.getCep());
             userProducerNotification.send(new NotificationDto(user.getEmail(), CREATE));
-            return user;
+
+            UserResponseDto userResponseDto = new UserResponseDto();
+            userResponseDto.setAddress(addressResponseDto);
+            userResponseDto.setUserFromDto(user);
+
+            return userResponseDto;
         } catch (DataIntegrityViolationException e) {
             throw new UserUniqueViolationException("CPF/Email already exists in the system.");
         }
@@ -54,16 +72,42 @@ public class UserService {
     }
 
     @Transactional
-    public void updateInformation(Long id, User user) {
+    public void updateInformation(Long id, UserUpdateDto userDto) {
         User existingUser = getUserById(id);
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setCpf(user.getCpf());
-        existingUser.setBirthdate(user.getBirthdate());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setCep(user.getCep());
-        existingUser.setActive(user.getActive());
+        existingUser.setFirstName(userDto.getFirstName());
+        existingUser.setLastName(userDto.getLastName());
+        existingUser.setCpf(userDto.getCpf());
+        existingUser.setBirthdate(userDto.getBirthdate());
+        existingUser.setEmail(userDto.getEmail());
+        existingUser.setActive(userDto.getActive());
         userRepository.save(existingUser);
-        userProducerNotification.send(new NotificationDto(user.getEmail(), UPDATE));
+
+        AddressDto address = userProducerAddress.saveAddress(userDto.getCep());
+        existingUser.setAddresses_id(address.getId());
+
+        AddressResponseDto addressResponseDto = new AddressResponseDto();
+        addressResponseDto.setAddressFromDto(address);
+
+        userProducerNotification.send(new NotificationDto(userDto.getEmail(), UPDATE));
+
+        UserResponseDto userResponseDto = new UserResponseDto();
+        userResponseDto.setAddress(addressResponseDto);
+        userResponseDto.setUserFromDto(existingUser);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponseDto getUserAddressById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("User not found.")
+        );
+        AddressDto address = userProducerAddress.getAddressById(user.getAddresses_id());
+        AddressResponseDto addressResponseDto = new AddressResponseDto();
+        addressResponseDto.setAddressFromDto(address);
+
+        UserResponseDto UserResponseDto = new UserResponseDto();
+        UserResponseDto.setAddress(addressResponseDto);
+        UserResponseDto.setUserFromDto(user);
+
+        return UserResponseDto;
     }
 }
