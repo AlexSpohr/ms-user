@@ -5,7 +5,7 @@ import com.compassuol.sp.challenge.msuser.domain.user.entity.User;
 
 import com.compassuol.sp.challenge.msuser.domain.user.exception.UserUniqueViolationException;
 import com.compassuol.sp.challenge.msuser.domain.user.repository.UserRepository;
-import com.compassuol.sp.challenge.msuser.web.consumer.UserConsumerAddress;
+import com.compassuol.sp.challenge.msuser.web.producer.UserProducerAddress;
 import com.compassuol.sp.challenge.msuser.web.dto.NotificationDto;
 import com.compassuol.sp.challenge.msuser.web.producer.UserProducerNotification;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,7 +22,7 @@ import static com.compassuol.sp.challenge.msuser.domain.user.enums.Event.*;
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final UserConsumerAddress userConsumerAddress;
+    private final UserProducerAddress userProducerAddress;
     private final UserProducerNotification userProducerNotification;
 
     @Transactional
@@ -30,7 +30,7 @@ public class UserService {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
-            userConsumerAddress.saveAddress(user.getCep());
+            userProducerAddress.saveAddress(user.getCep());
             userProducerNotification.send(new NotificationDto(user.getEmail(), CREATE));
             return user;
         } catch (DataIntegrityViolationException e) {
