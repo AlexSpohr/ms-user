@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.compassuol.sp.challenge.msuser.domain.user.enums.Event.*;
+import static com.compassuol.sp.challenge.msuser.domain.user.jwt.JwtUtils.JWT_BEARER;
+import static com.compassuol.sp.challenge.msuser.domain.user.jwt.JwtUtils.tokenGenerate;
 
 @RequiredArgsConstructor
 @Service
@@ -37,7 +39,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             user.setActive(userDto.getActive());
 
-            AddressDto address = userProducerAddress.saveAddress(userDto.getCep());
+            AddressDto address = userProducerAddress.saveAddress(userDto.getCep(), JWT_BEARER + tokenGenerate(user.getEmail()));
             user.setAddresses_id(address.getId());
 
             AddressResponseDto addressResponseDto = new AddressResponseDto();
@@ -82,7 +84,7 @@ public class UserService {
         existingUser.setActive(userDto.getActive());
         userRepository.save(existingUser);
 
-        AddressDto address = userProducerAddress.saveAddress(userDto.getCep());
+        AddressDto address = userProducerAddress.saveAddress(userDto.getCep(), JWT_BEARER + tokenGenerate(existingUser.getEmail()));
         existingUser.setAddresses_id(address.getId());
 
         AddressResponseDto addressResponseDto = new AddressResponseDto();
@@ -100,7 +102,7 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("User not found.")
         );
-        AddressDto address = userProducerAddress.getAddressById(user.getAddresses_id());
+        AddressDto address = userProducerAddress.getAddressById(user.getAddresses_id(), JWT_BEARER + tokenGenerate(user.getEmail()).getToken());
         AddressResponseDto addressResponseDto = new AddressResponseDto();
         addressResponseDto.setAddressFromDto(address);
 
