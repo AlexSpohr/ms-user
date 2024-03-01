@@ -11,9 +11,13 @@ import com.compassuol.sp.challenge.msuser.web.producer.UserProducerNotification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.nio.file.AccessDeniedException;
 
 import static com.compassuol.sp.challenge.msuser.domain.user.enums.Event.*;
 import static com.compassuol.sp.challenge.msuser.domain.user.jwt.JwtUtils.JWT_BEARER;
@@ -39,7 +43,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             user.setActive(userDto.getActive());
 
-            AddressDto address = userProducerAddress.saveAddress(userDto.getCep(), JWT_BEARER + tokenGenerate(user.getEmail()));
+            AddressDto address = userProducerAddress.saveAddress(userDto.getCep(), JWT_BEARER + tokenGenerate(user.getEmail()).getToken());
             user.setAddresses_id(address.getId());
 
             AddressResponseDto addressResponseDto = new AddressResponseDto();
@@ -66,7 +70,16 @@ public class UserService {
     }
 
     @Transactional
-    public void updatePassword(Long id, User user ) {
+    public void updatePassword(Long id, User user ) throws AccessDeniedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User loggedInUser = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found."));
+
+        if (!loggedInUser.getId().equals(id)) {
+            throw new AccessDeniedException("User is not authorized to access this resource.");
+        }
+
         User userFound = getUserById(id);
         userFound.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(userFound);
@@ -74,7 +87,16 @@ public class UserService {
     }
 
     @Transactional
-    public void updateInformation(Long id, UserUpdateDto userDto) {
+    public void updateInformation(Long id, UserUpdateDto userDto) throws AccessDeniedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User loggedInUser = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found."));
+
+        if (!loggedInUser.getId().equals(id)) {
+            throw new AccessDeniedException("User is not authorized to access this resource.");
+        }
+
         User existingUser = getUserById(id);
         existingUser.setFirstName(userDto.getFirstName());
         existingUser.setLastName(userDto.getLastName());
@@ -84,7 +106,7 @@ public class UserService {
         existingUser.setActive(userDto.getActive());
         userRepository.save(existingUser);
 
-        AddressDto address = userProducerAddress.saveAddress(userDto.getCep(), JWT_BEARER + tokenGenerate(existingUser.getEmail()));
+        AddressDto address = userProducerAddress.saveAddress(userDto.getCep(), JWT_BEARER + tokenGenerate(existingUser.getEmail()).getToken());
         existingUser.setAddresses_id(address.getId());
 
         AddressResponseDto addressResponseDto = new AddressResponseDto();
@@ -98,7 +120,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponseDto getUserAddressById(Long id) {
+    public UserResponseDto getUserAddressById(Long id) throws AccessDeniedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        User loggedInUser = userRepository.findByEmail(loggedInUserEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found."));
+
+        if (!loggedInUser.getId().equals(id)) {
+            throw new AccessDeniedException("User is not authorized to access this resource.");
+        }
+
         User user = userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("User not found.")
         );
