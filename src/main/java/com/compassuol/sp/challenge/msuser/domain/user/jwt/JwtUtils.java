@@ -55,7 +55,7 @@ public class JwtUtils {
         JwtToken tokenObj = new JwtToken();
         tokenObj.setToken(token);
 
-        log.info("Gerando token para o email: {}", email);
+        log.info("Generating token for email: {}", email);
 
         return tokenObj;
     }
@@ -69,7 +69,7 @@ public class JwtUtils {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (JwtException ex) {
-            log.error(String.format("Token invalido %s", ex.getMessage()));
+            log.error(String.format("Invalid token %s", ex.getMessage()));
         }
         return null;
     }
@@ -87,7 +87,7 @@ public class JwtUtils {
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException ex) {
-            log.error(String.format("Token invalido %s", ex.getMessage()));
+            log.error(String.format("Invalid token %s", ex.getMessage()));
         }
         return false;
     }
