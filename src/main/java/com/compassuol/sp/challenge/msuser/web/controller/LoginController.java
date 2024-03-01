@@ -30,7 +30,7 @@ public class LoginController {
 
     @Operation(summary = "Login", description = "Feature to login a user by email and password",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "User successfully logged in",
+                    @ApiResponse(responseCode = "200", description = "User successfully logged in",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
                     @ApiResponse(responseCode = "422", description = "Resource not processed due to invalid input data",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
