@@ -1,6 +1,5 @@
 package com.compassuol.sp.challenge.msuser.web.controller;
 
-import com.compassuol.sp.challenge.msuser.TestUtil;
 import com.compassuol.sp.challenge.msuser.domain.user.exception.UserUniqueViolationException;
 import com.compassuol.sp.challenge.msuser.domain.user.service.UserService;
 import com.compassuol.sp.challenge.msuser.web.dto.UserCreateDto;
@@ -40,17 +39,26 @@ class UserControllerTest {
     @MockBean
     UserService userService;
 
-
     @Test
     void createUser_WithValidParams_ReturnsCreated201() throws Exception {
-        String request = TestUtil.readStringFromFile("json/UserResponseDto.json");
+        UserCreateDto validUser = new UserCreateDto();
+        validUser.setFirstName("Nome");
+        validUser.setLastName("Sobrenome");
+        validUser.setCpf("589.410.480-79");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = dateFormat.parse("2000-04-04");
+        validUser.setBirthdate(date);
+        validUser.setEmail("teste16@email.com");
+        validUser.setCep("98910-000");
+        validUser.setPassword("12345678");
+        validUser.setActive(true);
 
         when(userService.createUser(any())).thenReturn(USER_RESPONSE);
 
         mockMvc
                 .perform(
                         post("/v1/users")
-                                .content(request)
+                                .content(objectMapper.writeValueAsString(validUser))
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
@@ -74,7 +82,7 @@ class UserControllerTest {
         existingUser.setLastName("Sobrenome");
         existingUser.setCpf("589.410.480-79");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = null;
+        Date date;
         try {
             date = dateFormat.parse("2000-04-04");
         } catch (ParseException e) {
@@ -148,6 +156,71 @@ class UserControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void updatePassword_WithExistingId_ReturnsOk200() throws Exception {
+        long validId = 1L;
+        UserPasswordDto userPasswordDto = new UserPasswordDto();
+        userPasswordDto.setPassword("newPassword");
 
+        doNothing().when(userService).updatePassword(eq(validId), any());
 
+        mockMvc
+                .perform(
+                        put("/v1/users/" + validId + "/password")
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userPasswordDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updatePassword_WithNonExistingId_ReturnsNotFound404() throws Exception {
+        long nonExistingId = -1L;
+        UserPasswordDto userPasswordDto = new UserPasswordDto();
+        userPasswordDto.setPassword("newPassword");
+
+        doThrow(new EntityNotFoundException("User not found.")).when(userService).updatePassword(eq(nonExistingId), any());
+
+        mockMvc
+                .perform(
+                        put("/v1/users/" + nonExistingId + "/password")
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userPasswordDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updatePassword_WithInvalidParams_ReturnsUnprocessableEntity422() throws Exception {
+        long validId = 1L;
+        UserPasswordDto userPasswordDto = new UserPasswordDto();
+        userPasswordDto.setPassword(null);
+
+        doThrow(new IllegalArgumentException("Password cannot be null.")).when(userService).updatePassword(eq(validId), any());
+
+        mockMvc
+                .perform(
+                        put("/v1/users/" + validId + "/password")
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userPasswordDto)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void updatePassword_WithNotAuthorizedId_ReturnsForbidden403() throws Exception {
+        long notAuthorizedId = 1L;
+        UserPasswordDto userPasswordDto = new UserPasswordDto();
+        userPasswordDto.setPassword("newPassword");
+
+        doThrow(new AccessDeniedException("User is not authorized to access this resource.")).when(userService).updatePassword(eq(notAuthorizedId), any());
+
+        mockMvc
+                .perform(
+                        put("/v1/users/" + notAuthorizedId + "/password")
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userPasswordDto)))
+                .andExpect(status().isForbidden());
+    }
 }
