@@ -14,9 +14,10 @@ import lombok.*;
 public class LoginCreateDto {
     @NotBlank
     @Email
+    @Size(max = 256)
     private String email;
 
     @NotBlank
-    @Size(min = 6)
+    @Size(max = 100)
     private String password;
 }

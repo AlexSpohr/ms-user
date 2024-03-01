@@ -3,15 +3,16 @@ package com.compassuol.sp.challenge.msuser.web.dto;
 
 import com.compassuol.sp.challenge.msuser.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class UserResponseDto {
     private Long id;
     private AddressResponseDto address;
