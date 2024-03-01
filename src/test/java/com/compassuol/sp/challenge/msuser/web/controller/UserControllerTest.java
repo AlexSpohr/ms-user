@@ -4,6 +4,7 @@ import com.compassuol.sp.challenge.msuser.domain.user.exception.UserUniqueViolat
 import com.compassuol.sp.challenge.msuser.domain.user.service.UserService;
 import com.compassuol.sp.challenge.msuser.web.dto.UserCreateDto;
 import com.compassuol.sp.challenge.msuser.web.dto.UserPasswordDto;
+import com.compassuol.sp.challenge.msuser.web.dto.UserUpdateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -221,6 +222,98 @@ class UserControllerTest {
                                 .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(userPasswordDto)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void updateUser_WithValidParams_ReturnsOk200() throws Exception {
+        long validId = 1L;
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setFirstName("testeupdate");
+        userUpdateDto.setLastName("sobrenomeupdate");
+        userUpdateDto.setCpf("375.735.210-65");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = dateFormat.parse("2004-03-03");
+        userUpdateDto.setBirthdate(date);
+        userUpdateDto.setEmail("testeupdate@email.com");
+        userUpdateDto.setCep("98910-000");
+        userUpdateDto.setActive(false);
+
+        doNothing().when(userService).updateInformation(eq(validId), any());
+
+        mockMvc
+                .perform(
+                        put("/v1/users/" + validId)
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userUpdateDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateUser_WithNonExistingId_ReturnsNotFound404() throws Exception {
+        long nonExistingId = -1L;
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setFirstName("testeupdate");
+        userUpdateDto.setLastName("sobrenomeupdate");
+        userUpdateDto.setCpf("375.735.210-65");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = dateFormat.parse("2004-03-03");
+        userUpdateDto.setBirthdate(date);
+        userUpdateDto.setEmail("testeupdate@email.com");
+        userUpdateDto.setCep("98910-000");
+        userUpdateDto.setActive(false);
+
+        doThrow(new EntityNotFoundException("User not found.")).when(userService).updateInformation(eq(nonExistingId), any());
+
+        mockMvc
+                .perform(
+                        put("/v1/users/" + nonExistingId)
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userUpdateDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateUser_WithInvalidParams_ReturnsUnprocessableEntity422() throws Exception {
+        long validId = 1L;
+        UserUpdateDto invalidUserUpdateDto = new UserUpdateDto();
+        invalidUserUpdateDto.setFirstName("");
+
+        doThrow(new IllegalArgumentException("Invalid data")).when(userService).updateInformation(eq(validId), any());
+
+        mockMvc
+                .perform(
+                        put("/v1/users/" + validId)
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidUserUpdateDto)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void updateUser_WithNotAuthorizedId_ReturnsForbidden403() throws Exception {
+        long notAuthorizedId = 1L;
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setFirstName("testeupdate");
+        userUpdateDto.setLastName("sobrenomeupdate");
+        userUpdateDto.setCpf("375.735.210-65");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = dateFormat.parse("2004-03-03");
+        userUpdateDto.setBirthdate(date);
+        userUpdateDto.setEmail("testeupdate@email.com");
+        userUpdateDto.setCep("98910-000");
+        userUpdateDto.setActive(false);
+
+        doThrow(new AccessDeniedException("User is not authorized to access this resource.")).when(userService).updateInformation(eq(notAuthorizedId), any());
+
+        mockMvc
+                .perform(
+                        put("/v1/users/" + notAuthorizedId)
+                                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZTJAZW1haWwuY29tIiwiaWF0IjoxNzA5MjMxOTY0LCJleHAiOjE3MDkyMzI1NjR9.VxjeDLGyZsFQle5yIml-bmYg-23JmOtvL33QbDCiE98")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(userUpdateDto)))
                 .andExpect(status().isForbidden());
     }
 }
