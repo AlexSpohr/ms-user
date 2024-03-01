@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/users")
@@ -44,10 +46,12 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "User found successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "User is not authorized to access this resource.",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) throws AccessDeniedException {
         UserResponseDto user = userService.getUserAddressById(id);
         return ResponseEntity.ok(user);
     }
@@ -59,10 +63,12 @@ public class UserController {
                     @ApiResponse(responseCode = "404", description = "User not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "422", description = "Resource not processed due to invalid input data",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "User is not authorized to access this resource.",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @PutMapping("/{id}/password")
-    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto userPasswordDto) {
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDto userPasswordDto) throws AccessDeniedException {
         userService.updatePassword(id, UserMapper.toEntity(userPasswordDto));
         return ResponseEntity.ok().build();
     }
@@ -74,10 +80,12 @@ public class UserController {
                     @ApiResponse(responseCode = "404", description = "User not found",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "422", description = "Resource not processed due to invalid input data",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "User is not authorized to access this resource.",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) {
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userUpdateDto) throws AccessDeniedException {
         userService.updateInformation(id, userUpdateDto);
         return ResponseEntity.ok().build();
     }
