@@ -2,6 +2,7 @@ package com.compassuol.sp.challenge.msuser.config;
 
 import com.compassuol.sp.challenge.msuser.domain.user.jwt.JwtAuthenticationEntryPoint;
 import com.compassuol.sp.challenge.msuser.domain.user.jwt.JwtAuthorizationFilter;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +42,7 @@ public class SpringSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "v1/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "v1/login").permitAll()
                         .requestMatchers(DOCUMENTATION_OPENAPI).permitAll()
