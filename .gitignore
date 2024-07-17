@@ -2,12 +2,13 @@
 untitled/
 htmlReport/
 
-# Ignorar a pasta target, exceto quando estiver dentro de src/main ou src/test
+# Outros padrões
 target/
+!.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-# Ignorar pastas de IDEs
+# Ignorar a pasta target, exceto quando estiver dentro de src/main ou src/test
 .idea/
 *.iws
 *.iml
