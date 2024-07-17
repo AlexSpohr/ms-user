@@ -1,29 +1,31 @@
-### IntelliJ IDEA ###
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+# Ignorar pastas específicas
+untitled/
+htmlReport/
 
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+# Ignorar a pasta target, exceto quando estiver dentro de src/main ou src/test
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-### NetBeans ###
+# Ignorar pastas de IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Ignorar arquivos e pastas do NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### VS Code ###
+# Ignorar pastas do VS Code
 .vscode/
 
-### Mac OS ###
+# Outros arquivos ou pastas que você não quer no controle de versão
 .DS_Store
+Thumbs.db
